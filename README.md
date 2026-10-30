@@ -1,2 +1,82 @@
 # Quizliceo
 Quiz liceo
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz di Cultura Generale</title>
+<style>
+:root{--bg:#f5f6fa;--card:#fff;--tx:#1d2433;--ac:#3b5bdb;--ok:#2f9e44;--ko:#e03131}
+@media(prefers-color-scheme:dark){:root{--bg:#12151c;--card:#1c212c;--tx:#eef0f5;--ac:#748ffc;--ok:#51cf66;--ko:#ff6b6b}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx);display:flex;justify-content:center;padding:16px}
+.card{background:var(--card);border-radius:16px;padding:24px;max-width:560px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+h1{margin:0 0 8px;font-size:1.5rem}
+.bar{height:8px;background:rgba(128,128,128,.25);border-radius:4px;margin:12px 0}
+.bar div{height:100%;background:var(--ac);border-radius:4px;transition:width .3s}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;border:2px solid rgba(128,128,128,.3);border-radius:10px;background:none;color:inherit;font-size:1rem;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ac)}
+.opt.ok{border-color:var(--ok);background:rgba(47,158,68,.15)}
+.opt.ko{border-color:var(--ko);background:rgba(224,49,49,.15)}
+.btn{margin-top:12px;padding:12px 20px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1rem;cursor:pointer}
+.small{opacity:.7;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const Q=[
+["Chi scrisse la «Divina Commedia»?",["Petrarca","Dante Alighieri","Boccaccio","Ariosto"],1],
+["In che anno è iniziata la Rivoluzione francese?",["1776","1789","1815","1848"],1],
+["Qual è la capitale dell'Australia?",["Sydney","Melbourne","Canberra","Perth"],2],
+["Chi dipinse la «Gioconda»?",["Michelangelo","Raffaello","Leonardo da Vinci","Caravaggio"],2],
+["Qual è l'elemento chimico con simbolo «Fe»?",["Fluoro","Ferro","Fosforo","Francio"],1],
+["Chi formulò la teoria della relatività?",["Newton","Galileo","Einstein","Bohr"],2],
+["Quale filosofo scrisse «La Repubblica»?",["Aristotele","Socrate","Platone","Epicuro"],2],
+["In che anno è avvenuto lo sbarco in Normandia?",["1939","1942","1944","1945"],2],
+["Qual è il fiume più lungo d'Italia?",["Tevere","Adige","Po","Arno"],2],
+["Chi è l'autore de «I Promessi Sposi»?",["Verga","Manzoni","Leopardi","Foscolo"],1],
+["Quanti sono i continenti comunemente riconosciuti?",["5","6","7","8"],2],
+["Chi scoprì l'America nel 1492?",["Vasco da Gama","Amerigo Vespucci","Cristoforo Colombo","Magellano"],2],
+["Qual è il pianeta più grande del Sistema Solare?",["Saturno","Giove","Nettuno","Urano"],1],
+["Quale poeta scrisse «L'infinito»?",["Pascoli","Ungaretti","Leopardi","Montale"],2],
+["In che anno è stata proclamata la Repubblica Italiana (referendum)?",["1861","1922","1946","1948"],2],
+["Qual è la formula chimica dell'acqua?",["CO2","H2O","O2","NaCl"],1],
+["Chi compose le «Quattro stagioni»?",["Mozart","Vivaldi","Verdi","Bach"],1],
+["Quale battaglia segnò la fine di Napoleone nel 1815?",["Austerlitz","Lipsia","Waterloo","Borodino"],2],
+["Chi scrisse «Il Principe»?",["Guicciardini","Machiavelli","Tasso","Vico"],1],
+["Qual è l'organo che pompa il sangue nel corpo umano?",["Fegato","Polmone","Cuore","Rene"],2]
+];
+let i=0,score=0,locked=false;
+const app=document.getElementById("app");
+function start(){i=0;score=0;show()}
+function show(){
+ locked=false;
+ const [q,opts]=Q[i];
+ app.innerHTML=`<h1>Quiz di Cultura Generale</h1>
+ <div class="small">Domanda ${i+1} di ${Q.length}</div>
+ <div class="bar"><div style="width:${i/Q.length*100}%"></div></div>
+ <h2 style="font-size:1.15rem">${q}</h2>
+ ${opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join("")}
+ <div id="nx"></div>`;
+ app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+}
+function answer(k){
+ if(locked)return;locked=true;
+ const c=Q[i][2];
+ if(k===c)score++;
+ app.querySelectorAll(".opt").forEach((b,n)=>{b.disabled=true;if(n===c)b.classList.add("ok");else if(n===k)b.classList.add("ko")});
+ document.getElementById("nx").innerHTML=`<button class="btn" id="go">${i<Q.length-1?"Avanti":"Vedi risultato"}</button>`;
+ document.getElementById("go").onclick=()=>{i++;i<Q.length?show():end()};
+}
+function end(){
+ const p=Math.round(score/Q.length*100);
+ const m=p>=80?"Ottimo! 🎉":p>=50?"Bene, ma puoi migliorare 💪":"Riprova, ce la farai! 📚";
+ app.innerHTML=`<h1>Risultato</h1><h2>${score} / ${Q.length} (${p}%)</h2><p>${m}</p><button class="btn" id="re">Rifai il quiz</button>`;
+ document.getElementById("re").onclick=start;
+}
+start();
+</script>
+</body>
+</html>
